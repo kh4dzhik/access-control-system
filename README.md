@@ -62,52 +62,75 @@
   }
   
 
-
-flowchart TD
-    A[Начало: Запрос пользователя] --> B{Есть ли JWT токен?}
-    B -->|Нет| C[401 Unauthorized]
-    B -->|Да| D[Валидация токена]
-    D -->|Невалиден| C
-    D -->|Валиден| E[Получение пользователя]
-    E --> F{Пользователь\nсуществует?}
-    F -->|Нет| C
-    F -->|Да| G{is_superuser?}
-    G -->|Да| H[✅ Доступ разрешен]
-    G -->|Нет| I[Получение ролей пользователя]
+```mermaid
+erDiagram
+    User ||--o{ UserRole : has
+    User ||--o{ AccessAuditLog : creates
+    User ||--o{ AccessRule : "created by"
     
-    I --> J{Роли есть?}
-    J -->|Нет| K[403 Forbidden]
-    J -->|Да| L[Поиск правил доступа]
+    Role ||--o{ UserRole : assigned
+    Role ||--o{ RolePermission : includes
+    Role ||--o{ AccessRule : defines
     
-    L --> M{Правила найдены?}
-    M -->|Нет| K
-    M -->|Да| N[Сортировка по priority]
+    Permission ||--o{ RolePermission : "belongs to"
     
-    N --> O[Проверка первого правила]
-    O --> P{Scope = GLOBAL?}
-    P -->|Да| H
-    P -->|Нет| Q{Scope = DEPARTMENT?}
+    AccessRule ||--o{ AccessAuditLog : "logged in"
     
-    Q -->|Да| R{department совпадает?}
-    R -->|Да| H
-    R -->|Нет| S[Проверка следующего правила]
+    User {
+        int id PK
+        varchar email UK
+        varchar full_name
+        varchar department
+        boolean is_active
+        boolean is_staff
+        timestamp date_joined
+    }
     
-    Q -->|Нет| T{Scope = OWNER?}
-    T -->|Да| U{owner_id == user.id?}
-    U -->|Да| H
-    U -->|Нет| S
+    Role {
+        int id PK
+        varchar name UK
+        text description
+        varchar scope "GLOBAL/DEPARTMENT/OWNER/CUSTOM"
+    }
     
-    T -->|Нет| V{Scope = CUSTOM?}
-    V -->|Да| W[Подстановка переменных]
-    W --> X{Объект соответствует\nfilter_condition?}
-    X -->|Да| H
-    X -->|Нет| S
+    Permission {
+        int id PK
+        varchar name UK
+        varchar resource_type
+        varchar action
+    }
     
-    V -->|Нет| S
-    S --> Y{Есть еще правила?}
-    Y -->|Да| O
-    Y -->|Нет| K
+    UserRole {
+        int id PK
+        int user_id FK
+        int role_id FK
+        timestamp assigned_at
+    }
     
-    H --> Z[Логирование решения]
-    K --> Z
-    Z --> AA[Конец]
+    RolePermission {
+        int id PK
+        int role_id FK
+        int permission_id FK
+    }
+    
+    AccessRule {
+        int id PK
+        int role_id FK
+        varchar resource_type
+        varchar action
+        jsonb filter_condition
+        boolean is_active
+        int priority
+    }
+    
+    AccessAuditLog {
+        int id PK
+        int user_id FK
+        varchar resource_type
+        varchar resource_id
+        varchar action
+        boolean decision
+        text reason
+        inet ip_address
+        timestamp created_at
+    }

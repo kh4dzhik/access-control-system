@@ -1,10 +1,35 @@
 # Система разграничения прав доступа (Access Control System)
 
+## Архитектура
+```mermaid
+flowchart LR
+    Client[Клиент\nВеб/Мобильное приложение] -->|1. Отправляет запрос| Gateway[API Gateway\nDjango REST Framework]
+    
+    Gateway -->|2. Проверяет токен| JWT[JWT Аутентификация]
+    
+    JWT -->|3. Токен валидный| Access[Access Control Engine\nМеханизм проверки прав]
+    
+    Access -->|4. Проверяет правила| DB[(PostgreSQL\nБаза данных)]
+    
+    DB -->|5. Возвращает результат| Access
+    
+    Access -->|6. Разрешить/Запретить| Gateway
+    
+    Gateway -->|7. Ответ клиенту| Client
+    
+    style Client fill:#e1f5fe,stroke:#01579b
+    style Gateway fill:#f3e5f5,stroke:#4a148c
+    style JWT fill:#fff3e0,stroke:#e65100
+    style Access fill:#e8f5e9,stroke:#1b5e20
+    style DB fill:#fce4ec,stroke:#b71c1c
+```
+
 ## Общее описание
 
 Разработанная система управления доступом представляет собой гибридную модель, сочетающую в себе **RBAC** (Role-Based Access Control - управление доступом на основе ролей) и **ABAC** (Attribute-Based Access Control - управление доступом на основе атрибутов). 
 
 Ключевая особенность системы - **правила доступа хранятся непосредственно в базе данных** и могут быть изменены администратором в режиме реального времени без перезапуска приложения или изменения кода.
+
 
 ## Основные принципы работы
 
@@ -60,29 +85,7 @@
     "is_active": true,
     "priority": 10
   }
-## Архитектура
-```mermaid
-flowchart LR
-    Client[Клиент\nВеб/Мобильное приложение] -->|1. Отправляет запрос| Gateway[API Gateway\nDjango REST Framework]
-    
-    Gateway -->|2. Проверяет токен| JWT[JWT Аутентификация]
-    
-    JWT -->|3. Токен валидный| Access[Access Control Engine\nМеханизм проверки прав]
-    
-    Access -->|4. Проверяет правила| DB[(PostgreSQL\nБаза данных)]
-    
-    DB -->|5. Возвращает результат| Access
-    
-    Access -->|6. Разрешить/Запретить| Gateway
-    
-    Gateway -->|7. Ответ клиенту| Client
-    
-    style Client fill:#e1f5fe,stroke:#01579b
-    style Gateway fill:#f3e5f5,stroke:#4a148c
-    style JWT fill:#fff3e0,stroke:#e65100
-    style Access fill:#e8f5e9,stroke:#1b5e20
-    style DB fill:#fce4ec,stroke:#b71c1c
-```
+
 
 ## Архитектура БД
 ```mermaid

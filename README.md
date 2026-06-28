@@ -60,25 +60,25 @@
     "is_active": true,
     "priority": 10
   }
-  
+
+
+
+## Архитектура БД
 
 ```mermaid
 erDiagram
-    User ||--o{ UserRole : has
-    User ||--o{ AccessAuditLog : creates
-    User ||--o{ AccessRule : "created by"
+    User ||--o{ UserRole : имеет
+    User ||--o{ AccessAuditLog : создает
     
-    Role ||--o{ UserRole : assigned
-    Role ||--o{ RolePermission : includes
-    Role ||--o{ AccessRule : defines
+    Role ||--o{ UserRole : назначена
+    Role ||--o{ RolePermission : включает
+    Role ||--o{ AccessRule : определяет
     
-    Permission ||--o{ RolePermission : "belongs to"
-    
-    AccessRule ||--o{ AccessAuditLog : "logged in"
+    Permission ||--o{ RolePermission : содержит
     
     User {
         int id PK
-        varchar email UK
+        varchar email
         varchar full_name
         varchar department
         boolean is_active
@@ -88,14 +88,14 @@ erDiagram
     
     Role {
         int id PK
-        varchar name UK
+        varchar name
         text description
-        varchar scope "GLOBAL/DEPARTMENT/OWNER/CUSTOM"
+        varchar scope
     }
     
     Permission {
         int id PK
-        varchar name UK
+        varchar name
         varchar resource_type
         varchar action
     }
@@ -127,10 +127,64 @@ erDiagram
         int id PK
         int user_id FK
         varchar resource_type
-        varchar resource_id
         varchar action
         boolean decision
         text reason
-        inet ip_address
         timestamp created_at
     }
+
+
+
+
+## АЛГОРИТМ ПРОВЕРКИ ДОСТУПА
+```mermaid
+
+flowchart TD
+    Start([ПРИХОДИТ ЗАПРОС]) --> Step1[1. Проверяем токен]
+    
+    Step1 --> Q1{Токен верный?}
+    Q1 -->|Нет| Error1[❌ 401 - Не авторизован]
+    Q1 -->|Да| Step2[2. Получаем пользователя]
+    
+    Step2 --> Q2{Это суперпользователь?}
+    Q2 -->|Да| Success[✅ ДОСТУП ЕСТЬ]
+    Q2 -->|Нет| Step3[3. Ищем роли пользователя]
+    
+    Step3 --> Q3{Роли есть?}
+    Q3 -->|Нет| Error2[❌ 403 - Нет прав]
+    Q3 -->|Да| Step4[4. Ищем правила доступа]
+    
+    Step4 --> Q4{Правила есть?}
+    Q4 -->|Нет| Error2
+    Q4 -->|Да| Step5[5. Проверяем правила по очереди]
+    
+    Step5 --> Check1{Правило GLOBAL?}
+    Check1 -->|Да| Success
+    
+    Check1 -->|Нет| Check2{Правило DEPARTMENT?}
+    Check2 -->|Да| Q5{Отдел совпадает?}
+    Q5 -->|Да| Success
+    Q5 -->|Нет| Next1[Смотрим следующее правило]
+    
+    Check2 -->|Нет| Check3{Правило OWNER?}
+    Check3 -->|Да| Q6{Владелец совпадает?}
+    Q6 -->|Да| Success
+    Q6 -->|Нет| Next1
+    
+    Check3 -->|Нет| Check4{Правило CUSTOM?}
+    Check4 -->|Да| Q7{Условия выполнены?}
+    Q7 -->|Да| Success
+    Q7 -->|Нет| Next1
+    
+    Check4 -->|Нет| Next1
+    
+    Next1 --> Q8{Еще правила есть?}
+    Q8 -->|Да| Step5
+    Q8 -->|Нет| Error2
+    
+    Success --> Log[📝 Запись в лог: Разрешено]
+    Error2 --> Log2[📝 Запись в лог: Запрещено]
+    Error1 --> End([КОНЕЦ])
+    
+    Log --> End
+    Log2 --> End

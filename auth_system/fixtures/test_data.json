@@ -1,0 +1,210 @@
+[
+  {
+    "model": "auth_system.role",
+    "pk": 1,
+    "fields": {
+      "name": "ADMIN",
+      "description": "System Administrator - full access",
+      "scope": "GLOBAL"
+    }
+  },
+  {
+    "model": "auth_system.role",
+    "pk": 2,
+    "fields": {
+      "name": "MANAGER",
+      "description": "Department Manager",
+      "scope": "DEPARTMENT"
+    }
+  },
+  {
+    "model": "auth_system.role",
+    "pk": 3,
+    "fields": {
+      "name": "USER",
+      "description": "Regular user - own resources only",
+      "scope": "OWNER"
+    }
+  },
+  {
+    "model": "auth_system.permission",
+    "pk": 1,
+    "fields": {
+      "name": "project:read",
+      "resource_type": "project",
+      "action": "read"
+    }
+  },
+  {
+    "model": "auth_system.permission",
+    "pk": 2,
+    "fields": {
+      "name": "project:create",
+      "resource_type": "project",
+      "action": "create"
+    }
+  },
+  {
+    "model": "auth_system.permission",
+    "pk": 3,
+    "fields": {
+      "name": "project:update",
+      "resource_type": "project",
+      "action": "update"
+    }
+  },
+  {
+    "model": "auth_system.permission",
+    "pk": 4,
+    "fields": {
+      "name": "project:delete",
+      "resource_type": "project",
+      "action": "delete"
+    }
+  },
+  {
+    "model": "auth_system.permission",
+    "pk": 5,
+    "fields": {
+      "name": "task:read",
+      "resource_type": "task",
+      "action": "read"
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 1,
+    "fields": {
+      "role": 1,
+      "permission": 1
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 2,
+    "fields": {
+      "role": 1,
+      "permission": 2
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 3,
+    "fields": {
+      "role": 1,
+      "permission": 3
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 4,
+    "fields": {
+      "role": 1,
+      "permission": 4
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 5,
+    "fields": {
+      "role": 2,
+      "permission": 1
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 6,
+    "fields": {
+      "role": 2,
+      "permission": 5
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 7,
+    "fields": {
+      "role": 3,
+      "permission": 1
+    }
+  },
+  {
+    "model": "auth_system.rolepermission",
+    "pk": 8,
+    "fields": {
+      "role": 3,
+      "permission": 5
+    }
+  },
+  {
+    "model": "auth_system.accessrule",
+    "pk": 1,
+    "fields": {
+      "role": 1,
+      "resource_type": "project",
+      "action": "read",
+      "filter_condition": {},
+      "is_active": true,
+      "priority": 100
+    }
+  },
+  {
+    "model": "auth_system.accessrule",
+    "pk": 2,
+    "fields": {
+      "role": 2,
+      "resource_type": "project",
+      "action": "read",
+      "filter_condition": {"department": "{{user.department}}"},
+      "is_active": true,
+      "priority": 50
+    }
+  },
+  {
+    "model": "auth_system.accessrule",
+    "pk": 3,
+    "fields": {
+      "role": 3,
+      "resource_type": "project",
+      "action": "read",
+      "filter_condition": {"owner_id": "{{user.id}}"},
+      "is_active": true,
+      "priority": 10
+    }
+  },
+  {
+    "model": "auth_system.accessrule",
+    "pk": 4,
+    "fields": {
+      "role": 3,
+      "resource_type": "task",
+      "action": "read",
+      "filter_condition": {"assigned_to": "{{user.id}}"},
+      "is_active": true,
+      "priority": 10
+    }
+  },
+  {
+    "model": "auth_system.accessrule",
+    "pk": 5,
+    "fields": {
+      "role": 2,
+      "resource_type": "task",
+      "action": "read",
+      "filter_condition": {"department": "{{user.department}}"},
+      "is_active": true,
+      "priority": 50
+    }
+  },
+  {
+    "model": "auth_system.accessrule",
+    "pk": 6,
+    "fields": {
+      "role": 1,
+      "resource_type": "task",
+      "action": "read",
+      "filter_condition": {},
+      "is_active": true,
+      "priority": 100
+    }
+  }
+]

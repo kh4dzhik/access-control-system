@@ -179,8 +179,8 @@ flowchart TD
     Q8 -->|Да| Step5
     Q8 -->|Нет| Error2
     
-    Success --> Log[📝 Запись в лог: Разрешено]
-    Error2 --> Log2[📝 Запись в лог: Запрещено]
+    Success --> Log[ Запись в лог: Разрешено]
+    Error2 --> Log2[ Запись в лог: Запрещено]
     Error1 --> End([КОНЕЦ])
     
     Log --> End

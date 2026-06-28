@@ -64,7 +64,6 @@
 
 
 ## Архитектура БД
-
 ```mermaid
 erDiagram
     User ||--o{ UserRole : имеет
@@ -77,7 +76,7 @@ erDiagram
     Permission ||--o{ RolePermission : содержит
     
     User {
-        int id PK
+        int id
         varchar email
         varchar full_name
         varchar department
@@ -87,35 +86,35 @@ erDiagram
     }
     
     Role {
-        int id PK
+        int id
         varchar name
         text description
         varchar scope
     }
     
     Permission {
-        int id PK
+        int id
         varchar name
         varchar resource_type
         varchar action
     }
     
     UserRole {
-        int id PK
-        int user_id FK
-        int role_id FK
+        int id
+        int user_id
+        int role_id
         timestamp assigned_at
     }
     
     RolePermission {
-        int id PK
-        int role_id FK
-        int permission_id FK
+        int id
+        int role_id
+        int permission_id
     }
     
     AccessRule {
-        int id PK
-        int role_id FK
+        int id
+        int role_id
         varchar resource_type
         varchar action
         jsonb filter_condition
@@ -124,16 +123,15 @@ erDiagram
     }
     
     AccessAuditLog {
-        int id PK
-        int user_id FK
+        int id
+        int user_id
         varchar resource_type
         varchar action
         boolean decision
         text reason
         timestamp created_at
     }
-
-
+```
 
 ## АЛГОРИТМ ПРОВЕРКИ ДОСТУПА
 ```mermaid
